@@ -11,16 +11,16 @@ export default function TheForm () {
     setName('');
     setPhone('');
     try {
-      const text = `Новая заявка по сайт стройка(3)!\nИмя: ${name}\nТелефон: ${phone}\nНик телеграма: ${nick}`;
-      const response = await axios.post('https://api.telegram.org/bot6806809280:AAFqNvMpRw2ZsyyuFIpzoLd331rvHR1y4mQ/sendMessage', {
-        text,
-        chat_id: '-1002107069189',
-      });
-      console.log(response.data);
+        const text = `Новая заявка по ВНЖ(1)!\nИмя: ${name}\nТелефон: ${phone}\nНик телеграма: ${nick}`;
+        const response = await axios.post('https://api.telegram.org/bot7127350416:AAF5Gip0fNEGLmbJLCTsZ_lhVYq0yPgpcWM/sendMessage', {
+            text,
+            chat_id: '-4125616791',
+        });
+        console.log(response.data);
     } catch (error) {
-      console.error(error);
+        console.error(error);
     }
-  };
+};
   return (
     <div>
       <div>
