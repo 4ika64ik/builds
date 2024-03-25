@@ -1,36 +1,49 @@
-import {useState} from 'react';
+import React, { useState , useEffect  } from 'react';
 import Form from "./Form";
 import axios from 'axios';
+import ReactPixel from 'react-facebook-pixel';
 
-export default function TheForm () {
+export default function TheForm() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [nick, setNick] = useState('');
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true); // Состояние для определения активности кнопки отправки
+
+  // Функция для проверки заполненности всех полей
+  const isFormValid = () => {
+    return name.trim() !== '' && phone.trim() !== '' && nick.trim() !== '';
+  };
+
+  // Обновление состояния активности кнопки отправки при изменении любого из полей
+  useEffect(() => {
+    setIsSubmitDisabled(!isFormValid());
+  }, [name, phone, nick]);
 
   const handleSubmit = async () => {
     setName('');
     setPhone('');
     try {
-        const text = `Новая заявка по ВНЖ(1)!\nИмя: ${name}\nТелефон: ${phone}\nНик телеграма: ${nick}`;
-        const response = await axios.post('https://api.telegram.org/bot7127350416:AAF5Gip0fNEGLmbJLCTsZ_lhVYq0yPgpcWM/sendMessage', {
-            text,
-            chat_id: '-4125616791',
-        });
-        console.log(response.data);
+      const text = `Новая заявка по ВНЖ(1)!\nИмя: ${name}\nТелефон: ${phone}\nНик телеграма: ${nick}`;
+      const response = await axios.post('https://api.telegram.org/bot7127350416:AAF5Gip0fNEGLmbJLCTsZ_lhVYq0yPgpcWM/sendMessage', {
+        text,
+        chat_id: '-4125616791',
+      });
+      ReactPixel.track('Lead');
+      console.log(response.data);
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
-};
+  };
+
   return (
     <div>
       <div>
         <p className="text-white">
-          Заполните форму и мы свяжеся с Вами в ближайшее время
+          Заполните форму и мы свяжемся с Вами в ближайшее время
         </p>
         <Form />
       </div>
-      <div className="flex justify-center  mt-44 sm:mt-20 mb-72">
-
+      <div className="flex justify-center mt-44 sm:mt-20 mb-72">
         <div className="bg-white p-8 rounded-lg shadow-md lg:w-96 w-full md:w-96">
           <div>
             <label>
@@ -56,7 +69,6 @@ export default function TheForm () {
               onChange={(e) => setNick(e.target.value)}
             />
           </div>
-
           <div className="mt-6">
             <label>
               <p className="text-gray-700 font-semibold">Телефон</p>
@@ -69,9 +81,8 @@ export default function TheForm () {
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
-
           <div className="mt-6 flex justify-center">
-            <button onClick={handleSubmit} className="text-blue-400 border border-blue-400 w-full py-2 hover:bg-blue-50 rounded">
+            <button onClick={handleSubmit} disabled={isSubmitDisabled} className={`text-blue-400 border border-blue-400 w-full py-2 rounded ${isSubmitDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'}`}>
               Отправить
             </button>
           </div>
