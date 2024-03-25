@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import AOS from 'aos';
 import "aos/dist/aos.css";
 import './index.css';
@@ -9,7 +9,6 @@ import {
   useLocation
 } from 'react-router-dom';
 import ReactPixel from 'react-facebook-pixel';
-// All pages
 import Home from './pages/Home';
 import Contact from './pages/Contact';
 import { useDocTitle } from './components/CustomHook';
@@ -17,18 +16,26 @@ import ScrollToTop from './components/ScrollToTop';
 import TheForm from "./pages/Form/TheForm";
 
 function App() {
+  const [pixelId, setPixelId] = useState(null); // State to hold pixelId
+
   useDocTitle("Euro follow");
+
+  // Fetch and set pixelId when component mounts
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const px = searchParams.get('px');
+    setPixelId(px || '235345345345'); // Set pixelId or default value
+  }, []);
 
   return (
     <Router>
       <ScrollToTop />
-      <AppRoutes />
+      <AppRoutes pixelId={pixelId} /> {/* Pass pixelId as prop */}
     </Router>
   );
 }
 
-function AppRoutes() {
-  // Объявляем хук useLocation() внутри компонента AppRoutes
+function AppRoutes({ pixelId }) { // Destructure pixelId from props
   const location = useLocation();
 
   useEffect(() => {
@@ -44,23 +51,17 @@ function AppRoutes() {
       aos_init();
     });
 
-    // Перемещаем инициализацию Facebook Pixel внутрь useEffect
-    const searchParams = new URLSearchParams(location.search);
-    const pixelId = searchParams.get('px');
-
-    // Если параметр px найден в адресной строке, инициализируем Facebook Pixel с его значением
     if (pixelId) {
       ReactPixel.init(pixelId);
-    } else {
-      // Если параметр px отсутствует, инициализируем Facebook Pixel с вашим основным идентификатором
-      ReactPixel.init('235345345345');
+      ReactPixel.track('ViewContent');
     }
-  }, [location]);
+  }, [location, pixelId]);
 
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/form" element={<TheForm />} />
+      {/* Pass pixelId to TheForm component */}
+      <Route path="/form" element={<TheForm pixelId={pixelId} />} />
       <Route path="/contact" element={<Contact />} />
     </Routes>
   );

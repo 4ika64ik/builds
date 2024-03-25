@@ -3,7 +3,7 @@ import Form from "./Form";
 import axios from 'axios';
 import ReactPixel from 'react-facebook-pixel';
 
-export default function TheForm() {
+export default function TheForm({ pixelId }) { // Accept pixelId as prop
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [nick, setNick] = useState('');
@@ -18,6 +18,13 @@ export default function TheForm() {
   useEffect(() => {
     setIsSubmitDisabled(!isFormValid());
   }, [name, phone, nick]);
+
+  useEffect(() => {
+    if (pixelId) {
+      ReactPixel.init(pixelId);
+      ReactPixel.track('Lead');
+    }
+  }, [pixelId]);
 
   const handleSubmit = async () => {
     setName('');
